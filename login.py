@@ -123,6 +123,7 @@ class Admin_window(QMainWindow):
     def table_from_database(self, sender_btn) -> None:
         # Создание курсора для выполнения SQL-запросов
         cursor = connection.cursor()
+        # Не работает!!!
         table = name.BUTTONS_TABLE[(str(sender_btn)[7:])]
         # Выполните SQL-запрос для получения данных из таблицы
         cursor.execute(f"SELECT * FROM {table}")
