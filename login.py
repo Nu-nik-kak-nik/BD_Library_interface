@@ -56,7 +56,6 @@ class Log_in(QMainWindow):
             query = f"SELECT type_user FROM Users_table WHERE login = '{login}' AND password = '{password}'"
             cursor.execute(query)
             user = cursor.fetchone()
-
             # Проверяем, есть ли пользователь с указанным логином и паролем
             if user:
                 self.ui.label_error.setText('Успешный вход')
@@ -122,25 +121,25 @@ class Admin_window(QMainWindow):
         self.table_from_database(sender_button)
 
     def table_from_database(self, sender_btn) -> None:
-        # # Создание курсора для выполнения SQL-запросов
-        # cursor = connection.cursor()
-        #
-        # # Выполните SQL-запрос для получения данных из таблицы
-        # cursor.execute(f"SELECT * FROM {name.BUTTONS_TABLE[str(sender_btn)]}")
-        # data = cursor.fetchall()
-        #
-        # # Отобразите данные в таблице
-        # self.ui.tableWidget.setRowCount(len(data))
-        # self.ui.tableWidget.setColumnCount(len(data[0]))
-        #
-        # for i, row in enumerate(data):
-        #     for j, value in enumerate(row):
-        #         item = QTableWidgetItem(str(value))
-        #         self.ui.tableWidget.setItem(i, j, item)
-        #
-        # # Закройте курсор и соединение
-        # cursor.close()
-        pass
+        # Создание курсора для выполнения SQL-запросов
+        cursor = connection.cursor()
+        table = name.BUTTONS_TABLE[(str(sender_btn)[7:])]
+        # Выполните SQL-запрос для получения данных из таблицы
+        cursor.execute(f"SELECT * FROM {table}")
+        data = cursor.fetchall()
+
+        # Отобразите данные в таблице
+        self.ui.tableWidget.setRowCount(len(data))
+        self.ui.tableWidget.setColumnCount(len(data[0]))
+
+        for i, row in enumerate(data):
+            for j, value in enumerate(row):
+                item = QTableWidgetItem(str(value))
+                self.ui.tableWidget.setItem(i, j, item)
+
+        # Закройте курсор и соединение
+        cursor.close()
+        # pass
 
 
 class librarian_window(QMainWindow):
