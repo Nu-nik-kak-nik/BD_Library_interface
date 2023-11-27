@@ -1,0 +1,12 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>event_seat_white_24dp.svg</file>
+    <file>pan_tool_white_24dp.svg</file>
+    <file>people_white_24dp.svg</file>
+    <file>book_white_24dp.svg</file>
+    <file>local_library_white_24dp.svg</file>
+    <file>outline_remove_red_eye_white_24dp.png</file>
+    <file>outline_visibility_off_white_24dp.png</file>
+    <file>lib.png</file>
+  </qresource>
+</RCC>
