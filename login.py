@@ -78,53 +78,29 @@ class Admin_window(QMainWindow):
         self.ui = admin_ui.Ui_MainWindow()
         self.ui.setupUi(self)
 
+        # Установка первой таблицы
+        self.ui.lib_btn.setChecked(True)
+        self.table_from_database('lib_btn')
+
         # кнопки отвечающие за вывод таблиц из бд
-        for btn in name.BUTTONS_TABLE:
+        for btn in name.LIST_BUTTON:
             getattr(self.ui, btn).clicked.connect(self.button_clicked)
-        #
-        # # Подключение к базе данных
-        # connection = psycopg2.connect(
-        #     user="admin",
-        #     password="admin!",
-        #     host="localhost",
-        #     port="5432",
-        #     database="TRZBD"
-        # )
-        #
-        # # Создание курсора для выполнения SQL-запросов
-        # cursor = connection.cursor()
-        #
-        # # Выполните SQL-запрос для получения данных из таблицы
-        # cursor.execute("SELECT * FROM library")
-        # data = cursor.fetchall()
-        #
-        # # Отобразите данные в таблице
-        # self.ui.tableWidget.setRowCount(len(data))
-        # self.ui.tableWidget.setColumnCount(len(data[0]))
-        #
-        # for i, row in enumerate(data):
-        #     for j, value in enumerate(row):
-        #         item = QTableWidgetItem(str(value))
-        #         self.ui.tableWidget.setItem(i, j, item)
-        #
-        # # Закройте курсор и соединение
-        # cursor.close()
-        # connection.close()
 
     def button_clicked(self) -> None:
         sender_button = self.sender()
-        for button in [self.ui.lib_btn, self.ui.room_btn, self.ui.book_btn, self.ui.readers_btn, self.ui.is_btn]:
-            if button != sender_button:
-                button.setChecked(False)
+        for button in name.LIST_BUTTON:
+            btn = getattr(self.ui, button)
+            if btn == sender_button:
+                btn.setChecked(True)
+                self.table_from_database(button)
             else:
-                sender_button.setChecked(True)
-        self.table_from_database(sender_button)
+                btn.setChecked(False)
 
     def table_from_database(self, sender_btn) -> None:
         # Создание курсора для выполнения SQL-запросов
         cursor = connection.cursor()
         # Не работает!!!
-        table = name.BUTTONS_TABLE[(str(sender_btn)[7:])]
+        table = name.BUTTONS_TABLE[str(sender_btn)]
         # Выполните SQL-запрос для получения данных из таблицы
         cursor.execute(f"SELECT * FROM {table}")
         data = cursor.fetchall()
@@ -138,9 +114,8 @@ class Admin_window(QMainWindow):
                 item = QTableWidgetItem(str(value))
                 self.ui.tableWidget.setItem(i, j, item)
 
-        # Закройте курсор и соединение
+        # Закрытие курсора
         cursor.close()
-        # pass
 
 
 class librarian_window(QMainWindow):

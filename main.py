@@ -103,53 +103,58 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 #     app.exec()
 
 
-from PySide6.QtWidgets import QApplication, QTableWidget, QTableWidgetItem
-import sys
-import psycopg2
+# from PySide6.QtWidgets import QApplication, QTableWidget, QTableWidgetItem
+# import sys
+# import psycopg2
+#
+#
+# class DatabaseApp(QApplication):
+#     def __init__(self):
+#         super().__init__(sys.argv)
+#         self.init_ui()
+#
+#     def init_ui(self):
+#         # Создайте окно приложения
+#         window = QTableWidget()
+#
+#         # Подключение к базе данных
+#         connection = psycopg2.connect(
+#             user="admin",
+#             password="admin!",
+#             host="localhost",
+#             port="5432",
+#             database="TRZBD"
+#         )
+#
+#         # Создание курсора для выполнения SQL-запросов
+#         cursor = connection.cursor()
+#
+#         # Выполните SQL-запрос для получения данных из таблицы
+#         cursor.execute("SELECT * FROM room")
+#         data = cursor.fetchall()
+#
+#         # Закройте курсор и соединение
+#         cursor.close()
+#         connection.close()
+#
+#         # Отобразите данные в таблице
+#         window.setRowCount(len(data))
+#         window.setColumnCount(len(data[0]))
+#
+#         for i, row in enumerate(data):
+#             for j, value in enumerate(row):
+#                 item = QTableWidgetItem(str(value))
+#                 window.setItem(i, j, item)
+#
+#         # Отобразите окно
+#         window.show()
+#
+#         sys.exit(self.exec())
+#
+# if __name__ == '__main__':
+#     app = DatabaseApp()
+import name
 
 
-class DatabaseApp(QApplication):
-    def __init__(self):
-        super().__init__(sys.argv)
-        self.init_ui()
-
-    def init_ui(self):
-        # Создайте окно приложения
-        window = QTableWidget()
-
-        # Подключение к базе данных
-        connection = psycopg2.connect(
-            user="admin",
-            password="admin!",
-            host="localhost",
-            port="5432",
-            database="TRZBD"
-        )
-
-        # Создание курсора для выполнения SQL-запросов
-        cursor = connection.cursor()
-
-        # Выполните SQL-запрос для получения данных из таблицы
-        cursor.execute("SELECT * FROM room")
-        data = cursor.fetchall()
-
-        # Закройте курсор и соединение
-        cursor.close()
-        connection.close()
-
-        # Отобразите данные в таблице
-        window.setRowCount(len(data))
-        window.setColumnCount(len(data[0]))
-
-        for i, row in enumerate(data):
-            for j, value in enumerate(row):
-                item = QTableWidgetItem(str(value))
-                window.setItem(i, j, item)
-
-        # Отобразите окно
-        window.show()
-
-        sys.exit(self.exec())
-
-if __name__ == '__main__':
-    app = DatabaseApp()
+table = name.BUTTONS_TABLE['lib_btn']
+print(table)
