@@ -9,4 +9,12 @@
     <file>outline_visibility_off_white_24dp.png</file>
     <file>lib.png</file>
   </qresource>
+  <qresource prefix="btn">
+    <file>feed_white_24dp.svg</file>
+    <file>delete_white_24dp.svg</file>
+    <file>edit_white_24dp.svg</file>
+    <file>save_white_24dp (1).svg</file>
+    <file>add_white_24dp.svg</file>
+    <file>logout_white_24dp.svg</file>
+  </qresource>
 </RCC>

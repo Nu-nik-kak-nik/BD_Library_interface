@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit, QTableWidgetItem
+from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit, QTableWidgetItem, QHeaderView
 import login_ui
 import librarian_ui
 import admin_ui
@@ -85,6 +85,10 @@ class Admin_window(QMainWindow):
         # кнопки отвечающие за вывод таблиц из бд
         for btn in name.LIST_BUTTON:
             getattr(self.ui, btn).clicked.connect(self.button_clicked)
+        # self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
+
+        # Выход в логин
+        # self.ui.btn
 
     def button_clicked(self) -> None:
         sender_button = self.sender()
@@ -113,6 +117,13 @@ class Admin_window(QMainWindow):
             for j, value in enumerate(row):
                 item = QTableWidgetItem(str(value))
                 self.ui.tableWidget.setItem(i, j, item)
+        # Устанавливаем ширину таблицы равной ширине родительского виджета (QMainWindow)
+        # Устанавливаем таблицу в центр основного виджета
+        # self.setCentralWidget(self.ui.tableWidget)
+        # Устанавливаем горизонтальные заголовки
+        # self.ui.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
+        # self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.tableWidget.resizeColumnsToContents()
 
         # Закрытие курсора
         cursor.close()
