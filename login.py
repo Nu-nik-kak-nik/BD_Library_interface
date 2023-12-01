@@ -6,7 +6,6 @@ import admin_ui
 import psycopg2
 import name
 
-
 con_bul = True
 try:
     connection = psycopg2.connect(
@@ -37,6 +36,8 @@ class Log_in(QMainWindow):
 
         # видимость пароля
         self.ui.pushButton.clicked.connect(self.visibility_password)
+        # при загрузке скрыть пароль
+        self.ui.lineEdit_password.setEchoMode(QLineEdit.Password)
 
         # вход в базу
         self.ui.login_btn.clicked.connect(self.open_new_window)
@@ -50,26 +51,28 @@ class Log_in(QMainWindow):
     def open_new_window(self) -> None:
         login = self.ui.lineEdit_login.text()
         password = self.ui.lineEdit_password.text()
-
-        if con_bul:
-            cursor = connection.cursor()
-            query = f"SELECT type_user FROM Users_table WHERE login = '{login}' AND password = '{password}'"
-            cursor.execute(query)
-            user = cursor.fetchone()
-            # Проверяем, есть ли пользователь с указанным логином и паролем
-            if user:
-                self.ui.label_error.setText('Успешный вход')
-                if user[0] == 'admin':
-                    self.new_window = Admin_window()
-                    self.new_window.show()
-                    self.hide()
+        if login and password:
+            if con_bul:
+                cursor = connection.cursor()
+                query = f"SELECT type_user FROM Users_table WHERE login = '{login}' AND password = '{password}'"
+                cursor.execute(query)
+                user = cursor.fetchone()
+                # Проверяем, есть ли пользователь с указанным логином и паролем
+                if user:
+                    if user[0] == 'admin':
+                        self.new_window = Admin_window()
+                        self.new_window.show()
+                        self.hide()
+                    else:
+                        self.new_window = librarian_window()
+                        self.new_window.show()
+                        self.hide()
+                    self.ui.lineEdit_login.setText('')
+                    self.ui.lineEdit_password.setText('')
+                    self.ui.label_error.setText('')
                 else:
-                    self.new_window = librarian_window()
-                    self.new_window.show()
-                    self.hide()
-            else:
-                self.ui.label_error.setText('Неверный логин или пароль')
-            cursor.close()
+                    self.ui.label_error.setText('Неверный логин или пароль')
+                cursor.close()
 
 
 class Admin_window(QMainWindow):
@@ -88,7 +91,10 @@ class Admin_window(QMainWindow):
         # self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
 
         # Выход в логин
-        # self.ui.btn
+        self.ui.logout_btn.clicked.connect(self.logout)
+
+        # Сохранить данные
+        self.ui.safe_btn.clicked.connect(self.get_checked_button)
 
     def button_clicked(self) -> None:
         sender_button = self.sender()
@@ -103,16 +109,19 @@ class Admin_window(QMainWindow):
     def table_from_database(self, sender_btn) -> None:
         # Создание курсора для выполнения SQL-запросов
         cursor = connection.cursor()
-        # Не работает!!!
+        # Извлечение названия таблицы
         table = name.BUTTONS_TABLE[str(sender_btn)]
         # Выполните SQL-запрос для получения данных из таблицы
         cursor.execute(f"SELECT * FROM {table}")
         data = cursor.fetchall()
-
+        # Получение заголовков столбцов
+        column_names = [desc[0] for desc in cursor.description]
+        # Установка заголовков в QTableWidget
+        self.ui.tableWidget.setColumnCount(len(column_names))
+        self.ui.tableWidget.setHorizontalHeaderLabels(column_names)
         # Отобразите данные в таблице
         self.ui.tableWidget.setRowCount(len(data))
         self.ui.tableWidget.setColumnCount(len(data[0]))
-
         for i, row in enumerate(data):
             for j, value in enumerate(row):
                 item = QTableWidgetItem(str(value))
@@ -124,8 +133,31 @@ class Admin_window(QMainWindow):
         # self.ui.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         # self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.tableWidget.resizeColumnsToContents()
-
         # Закрытие курсора
+        cursor.close()
+
+    def logout(self):
+        self.close()
+        window.show()
+        # self.new_window = librarian_window()
+        # self.new_window.show()
+        # self.hide()
+
+    def get_checked_button(self) -> None:
+        for button in name.LIST_BUTTON:
+            if getattr(self.ui, button).isChecked():
+                self.save_changes( button)
+
+    def save_changes(self, button) -> None:
+        # Создание курсора для выполнения SQL-запросов
+        cursor = connection.cursor()
+        for row in range(self.ui.tableWidget.rowCount()):
+            row_data = [self.ui.tableWidget.item(row, col).text() for col in range(self.ui.tableWidget.columnCount())]
+            primary_key_value = row_data[0]
+            # update_query = f"{name.UPDATES_TABLE[button]}"
+            update_query = f"UPDATE library SET libtitle='{row_data[1]}', address='{row_data[2]}', city='{row_data[3]}' WHERE idlibrary='{primary_key_value}'"
+            cursor.execute(update_query)
+        connection.commit()
         cursor.close()
 
 

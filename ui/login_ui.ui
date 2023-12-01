@@ -277,7 +277,7 @@ QPushButton:pressed{
            <bool>true</bool>
           </property>
           <property name="checked">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -307,6 +307,9 @@ QPushButton:pressed{
        <widget class="QPushButton" name="login_btn">
         <property name="text">
          <string>Вход</string>
+        </property>
+        <property name="shortcut">
+         <string>Return</string>
         </property>
        </widget>
       </item>

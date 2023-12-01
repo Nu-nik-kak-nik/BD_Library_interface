@@ -153,8 +153,60 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 #
 # if __name__ == '__main__':
 #     app = DatabaseApp()
-import name
 
 
-table = name.BUTTONS_TABLE['lib_btn']
-print(table)
+# import name
+#
+#
+# table = name.BUTTONS_TABLE['lib_btn']
+# print(table)
+
+
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout()
+
+        button_open_new_window = QPushButton('Open New Window', self)
+        button_open_new_window.clicked.connect(self.open_new_window)
+        layout.addWidget(button_open_new_window)
+
+        self.setLayout(layout)
+        self.setWindowTitle('Main Window')
+
+    def open_new_window(self):
+        self.new_window = NewWindow(self)
+        self.new_window.show()
+
+class NewWindow(QWidget):
+    def __init__(self, main_window):
+        super().__init__()
+
+        self.main_window = main_window
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout()
+
+        button_back = QPushButton('Back to Main Window', self)
+        button_back.clicked.connect(self.back_to_main_window)
+        layout.addWidget(button_back)
+
+        self.setLayout(layout)
+        self.setWindowTitle('New Window')
+
+    def back_to_main_window(self):
+        self.close()
+        self.main_window.show()
+
+if __name__ == '__main__':
+    app = QApplication([])
+    main_window = MainWindow()
+    main_window.show()
+    app.exec()
