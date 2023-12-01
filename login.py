@@ -49,30 +49,33 @@ class Log_in(QMainWindow):
             self.ui.lineEdit_password.setEchoMode(QLineEdit.Password)
 
     def open_new_window(self) -> None:
-        login = self.ui.lineEdit_login.text()
-        password = self.ui.lineEdit_password.text()
-        if login and password:
-            if con_bul:
-                cursor = connection.cursor()
-                query = f"SELECT type_user FROM Users_table WHERE login = '{login}' AND password = '{password}'"
-                cursor.execute(query)
-                user = cursor.fetchone()
-                # Проверяем, есть ли пользователь с указанным логином и паролем
-                if user:
-                    if user[0] == 'admin':
-                        self.new_window = Admin_window()
-                        self.new_window.show()
-                        self.hide()
-                    else:
-                        self.new_window = librarian_window()
-                        self.new_window.show()
-                        self.hide()
-                    self.ui.lineEdit_login.setText('')
-                    self.ui.lineEdit_password.setText('')
-                    self.ui.label_error.setText('')
-                else:
-                    self.ui.label_error.setText('Неверный логин или пароль')
-                cursor.close()
+        # login = self.ui.lineEdit_login.text()
+        # password = self.ui.lineEdit_password.text()
+        # if login and password:
+        #     if con_bul:
+        #         cursor = connection.cursor()
+        #         query = f"SELECT type_user FROM Users_table WHERE login = '{login}' AND password = '{password}'"
+        #         cursor.execute(query)
+        #         user = cursor.fetchone()
+        #         # Проверяем, есть ли пользователь с указанным логином и паролем
+        #         if user:
+        #             if user[0] == 'admin':
+        #                 self.new_window = Admin_window()
+        #                 self.new_window.show()
+        #                 self.hide()
+        #             else:
+        #                 self.new_window = librarian_window()
+        #                 self.new_window.show()
+        #                 self.hide()
+        #             self.ui.lineEdit_login.setText('')
+        #             self.ui.lineEdit_password.setText('')
+        #             self.ui.label_error.setText('')
+        #         else:
+        #             self.ui.label_error.setText('Неверный логин или пароль')
+        #         cursor.close()
+        self.new_window = Admin_window()
+        self.new_window.show()
+        self.hide()
 
 
 class Admin_window(QMainWindow):
@@ -146,17 +149,18 @@ class Admin_window(QMainWindow):
     def get_checked_button(self) -> None:
         for button in name.LIST_BUTTON:
             if getattr(self.ui, button).isChecked():
-                self.save_changes( button)
+                self.save_changes(button)
 
     def save_changes(self, button) -> None:
         # Создание курсора для выполнения SQL-запросов
         cursor = connection.cursor()
         for row in range(self.ui.tableWidget.rowCount()):
-            row_data = [self.ui.tableWidget.item(row, col).text() for col in range(self.ui.tableWidget.columnCount())]
-            primary_key_value = row_data[0]
-            # update_query = f"{name.UPDATES_TABLE[button]}"
-            update_query = f"UPDATE library SET libtitle='{row_data[1]}', address='{row_data[2]}', city='{row_data[3]}' WHERE idlibrary='{primary_key_value}'"
-            cursor.execute(update_query)
+            tuple_item = ()
+            for col in range(self.ui.tableWidget.columnCount()):
+                # ПОСТРОЧНА ЗАПИСИ ВЫТАСКИВАЕМ
+                tuple_item = tuple_item + (self.ui.tableWidget.item(row, col).text(),)
+            tuple_item = tuple_item[1:] + (tuple_item[0],)
+            cursor.execute(name.UPDATES_TABLE[button], tuple_item)
         connection.commit()
         cursor.close()
 
