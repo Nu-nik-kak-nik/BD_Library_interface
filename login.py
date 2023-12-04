@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit, QTableWidgetItem, QHeaderView, QFormLayout, QDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit, QTableWidgetItem
 import login_ui
 import librarian_ui
 import admin_ui
@@ -51,33 +51,33 @@ class Log_in(QMainWindow):
             self.ui.lineEdit_password.setEchoMode(QLineEdit.Password)
 
     def open_new_window(self) -> None:
-        # login = self.ui.lineEdit_login.text()
-        # password = self.ui.lineEdit_password.text()
-        # if login and password:
-        #     if con_bul:
-        #         cursor = connection.cursor()
-        #         query = f"SELECT type_user FROM Users_table WHERE login = '{login}' AND password = '{password}'"
-        #         cursor.execute(query)
-        #         user = cursor.fetchone()
-        #         # Проверяем, есть ли пользователь с указанным логином и паролем
-        #         if user:
-        #             if user[0] == 'admin':
-        #                 self.new_window = Admin_window()
-        #                 self.new_window.show()
-        #                 self.hide()
-        #             else:
-        #                 self.new_window = librarian_window()
-        #                 self.new_window.show()
-        #                 self.hide()
-        #             self.ui.lineEdit_login.setText('')
-        #             self.ui.lineEdit_password.setText('')
-        #             self.ui.label_error.setText('')
-        #         else:
-        #             self.ui.label_error.setText('Неверный логин или пароль')
-        #         cursor.close()
-        self.new_window = Admin_window()
-        self.new_window.show()
-        self.hide()
+        login = self.ui.lineEdit_login.text()
+        password = self.ui.lineEdit_password.text()
+        if login and password:
+            if con_bul:
+                cursor = connection.cursor()
+                query = f"SELECT type_user FROM Users_table WHERE login = '{login}' AND password = '{password}'"
+                cursor.execute(query)
+                user = cursor.fetchone()
+                # Проверяем, есть ли пользователь с указанным логином и паролем
+                if user:
+                    if user[0] == 'admin':
+                        self.new_window = Admin_window()
+                        self.new_window.show()
+                        self.hide()
+                    else:
+                        self.new_window = librarian_window()
+                        self.new_window.show()
+                        self.hide()
+                    self.ui.lineEdit_login.setText('')
+                    self.ui.lineEdit_password.setText('')
+                    self.ui.label_error.setText('')
+                else:
+                    self.ui.label_error.setText('Неверный логин или пароль')
+                cursor.close()
+        # self.new_window = Admin_window()
+        # self.new_window.show()
+        # self.hide()
 
 
 class Admin_window(QMainWindow):
@@ -116,6 +116,7 @@ class Admin_window(QMainWindow):
                 btn.setChecked(False)
 
     def table_from_database(self, sender_btn) -> None:
+        self.ui.tableWidget.clear()
         # Создание курсора для выполнения SQL-запросов
         cursor = connection.cursor()
         # Извлечение названия таблицы
@@ -159,7 +160,6 @@ class Admin_window(QMainWindow):
                 for btn in name.LIST_BUTTON_MANAGEMENT:
                     if getattr(self.ui, btn) == self.sender():
                         getattr(self, name.BUTTON_MANAGEMENT[btn])(button)
-                # self.save_changes(button)
 
     def save_changes(self, button) -> None:
         cursor = connection.cursor()
@@ -192,13 +192,33 @@ class Admin_window(QMainWindow):
     def new_row_db(self, button) -> None:
         cursor = connection.cursor()
         row = self.ui.tableWidget.rowCount() - 1
-        tuple_item = ()
+        entries = []
         for col in range(self.ui.tableWidget.columnCount()):
             # ПОСТРОЧНА ЗАПИСИ ВЫТАСКИВАЕМ
-            tuple_item = tuple_item + (self.ui.tableWidget.item(row, col).text(),)
-        cursor.execute(name.INSERT_TABLE[button], tuple_item)
+            entries.append(self.ui.tableWidget.item(row, col).text())
+        match button:
+            case 'lib_btn':
+                pass
+            case 'room_btn':
+                entries[2] = '1'
+                entries[3] = '0'
+                entries[4] = '0'
+                entries[6] = '0'
+                entries[7] = '0'
+            case 'book_btn':
+                entries[7] = '1'
+                entries[6] = '0'
+            case 'readers_btn':
+                entries[6] = '1991-12-31'
+                entries[7] = '1992-12-31'
+            case 'is_btn':
+                entries[1] = '4'
+                entries[2] = '1'
+                entries[3] = '1991-12-31'
+        cursor.execute(name.INSERT_TABLE[button], entries)
         connection.commit()
         cursor.close()
+        self.table_from_database(button)
 
     def delete_row(self, button):
         selected_row = self.ui.tableWidget.currentRow()

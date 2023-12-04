@@ -40,7 +40,7 @@ INSERT_TABLE = {
     'lib_btn': "INSERT INTO library (idlibrary, libtitle, address, city) VALUES (%s, %s, %s, %s)",
     'room_btn': "INSERT INTO room (idroom, nameroom, idlibrary, unitsliterature, numberseats, workinghours, floor, numberemployees) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
     'book_btn': "INSERT INTO  books (idliterature, littitle, lcategory, authors, publishing, yearpublishing, numpages, idroom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-    'readers_btn': "INSERT INTO  readers (idreader, lastname, firstname, surname, readercategory, rplace, birth, rdate) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+    'readers_btn': "INSERT INTO  readers (idreader, lastname, firstname, surname, readercategory, rplace, birth, rdate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
     'is_btn': "INSERT INTO issuance (idissuedlit, idreader, idliterature, dateissue, issueperiod, typeissue, collateral) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 }
 
