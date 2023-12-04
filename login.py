@@ -1,11 +1,13 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit, QTableWidgetItem, QHeaderView
+from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit, QTableWidgetItem, QHeaderView, QFormLayout, QDialog
 import login_ui
 import librarian_ui
 import admin_ui
 import psycopg2
 import name
 
+
+new_row = 0
 con_bul = True
 try:
     connection = psycopg2.connect(
@@ -89,7 +91,7 @@ class Admin_window(QMainWindow):
         self.table_from_database('lib_btn')
 
         # кнопки отвечающие за вывод таблиц из бд
-        for btn in name.LIST_BUTTON:
+        for btn in name.LIST_BUTTON_TABLE:
             getattr(self.ui, btn).clicked.connect(self.button_clicked)
         # self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
 
@@ -98,10 +100,14 @@ class Admin_window(QMainWindow):
 
         # Сохранить данные
         self.ui.safe_btn.clicked.connect(self.get_checked_button)
+        # создать новой записи
+        self.ui.new_btn.clicked.connect(self.get_checked_button)
+        # Удаление записи
+        self.ui.del_btn.clicked.connect(self.get_checked_button)
 
     def button_clicked(self) -> None:
         sender_button = self.sender()
-        for button in name.LIST_BUTTON:
+        for button in name.LIST_BUTTON_TABLE:
             btn = getattr(self.ui, button)
             if btn == sender_button:
                 btn.setChecked(True)
@@ -138,6 +144,7 @@ class Admin_window(QMainWindow):
         self.ui.tableWidget.resizeColumnsToContents()
         # Закрытие курсора
         cursor.close()
+        self.ui.tableWidget.sortItems(0)
 
     def logout(self):
         self.close()
@@ -147,12 +154,14 @@ class Admin_window(QMainWindow):
         # self.hide()
 
     def get_checked_button(self) -> None:
-        for button in name.LIST_BUTTON:
+        for button in name.LIST_BUTTON_TABLE:
             if getattr(self.ui, button).isChecked():
-                self.save_changes(button)
+                for btn in name.LIST_BUTTON_MANAGEMENT:
+                    if getattr(self.ui, btn) == self.sender():
+                        getattr(self, name.BUTTON_MANAGEMENT[btn])(button)
+                # self.save_changes(button)
 
     def save_changes(self, button) -> None:
-        # Создание курсора для выполнения SQL-запросов
         cursor = connection.cursor()
         for row in range(self.ui.tableWidget.rowCount()):
             tuple_item = ()
@@ -163,6 +172,45 @@ class Admin_window(QMainWindow):
             cursor.execute(name.UPDATES_TABLE[button], tuple_item)
         connection.commit()
         cursor.close()
+
+    def new_row_interface(self, button) -> None:
+        # Получаем количество строк в таблице
+        current_row_count = self.ui.tableWidget.rowCount()
+        # Вставляем новую строку в таблицу
+        self.ui.tableWidget.insertRow(current_row_count)
+        # Заполняем новую строку пустыми ячейками
+        for column in range(self.ui.tableWidget.columnCount()):
+            if column == 0:
+                item = self.ui.tableWidget.item(current_row_count - 1, 0).text()
+                item = QTableWidgetItem(str(int(item) + 1))
+            else:
+                item = QTableWidgetItem("")
+            self.ui.tableWidget.setItem(current_row_count, column, item)
+        # new_row += 1
+        self.new_row_db(button)
+
+    def new_row_db(self, button) -> None:
+        cursor = connection.cursor()
+        row = self.ui.tableWidget.rowCount() - 1
+        tuple_item = ()
+        for col in range(self.ui.tableWidget.columnCount()):
+            # ПОСТРОЧНА ЗАПИСИ ВЫТАСКИВАЕМ
+            tuple_item = tuple_item + (self.ui.tableWidget.item(row, col).text(),)
+        cursor.execute(name.INSERT_TABLE[button], tuple_item)
+        connection.commit()
+        cursor.close()
+
+    def delete_row(self, button):
+        selected_row = self.ui.tableWidget.currentRow()
+        if selected_row >= 0:
+            self.ui.tableWidget.removeRow(selected_row)
+            cursor = connection.cursor()
+            cursor.execute(name.DELETE_TABLE[button], str(selected_row+1))
+            connection.commit()
+            cursor.close()
+
+    def editing(self):
+        pass
 
 
 class librarian_window(QMainWindow):
