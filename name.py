@@ -52,3 +52,9 @@ DELETE_TABLE = {
     'is_btn': "DELETE from issuance WHERE idissuedlit=%s"
 }
 
+LIST_BUTTON_TABLE_LIB = [
+    'room_btn',
+    'book_btn',
+    'readers_btn',
+    'is_btn'
+]
