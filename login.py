@@ -104,6 +104,8 @@ class Admin_window(QMainWindow):
         self.ui.new_btn.clicked.connect(self.get_checked_button)
         # Удаление записи
         self.ui.del_btn.clicked.connect(self.get_checked_button)
+        # создание отчёта
+        self.ui.report_btn.clicked.connect(self.report_view)
 
     def button_clicked(self) -> None:
         sender_button = self.sender()
@@ -232,6 +234,23 @@ class Admin_window(QMainWindow):
     def editing(self):
         pass
 
+    def report_view(self) -> None:
+        cursor = connection.cursor()
+        cursor.execute(name.REPORT[0])
+        connection.commit()
+        self.ui.tableWidget.clear()
+        data = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
+        self.ui.tableWidget.setColumnCount(len(column_names))
+        self.ui.tableWidget.setHorizontalHeaderLabels(column_names)
+        self.ui.tableWidget.setRowCount(len(data))
+        self.ui.tableWidget.setColumnCount(len(data[0]))
+        for i, row in enumerate(data):
+            for j, value in enumerate(row):
+                item = QTableWidgetItem(str(value))
+                self.ui.tableWidget.setItem(i, j, item)
+        cursor.close()
+
 
 class librarian_window(QMainWindow):
     def __init__(self):
@@ -256,6 +275,8 @@ class librarian_window(QMainWindow):
         self.ui.new_btn.clicked.connect(self.get_checked_button)
         # Удаление записи
         self.ui.del_btn.clicked.connect(self.get_checked_button)
+        # создание отчёта
+        self.ui.report_btn.connect(self.report_view)
 
     def button_clicked(self) -> None:
         sender_button = self.sender()
@@ -381,8 +402,25 @@ class librarian_window(QMainWindow):
             connection.commit()
             cursor.close()
 
-    def editing(self):
+    def editing(self) -> None:
         pass
+
+    def report_view(self) -> None:
+        cursor = connection.cursor()
+        cursor.execute(name.REPORT[0])
+        connection.commit()
+        self.ui.tableWidget.clear()
+        data = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
+        self.ui.tableWidget.setColumnCount(len(column_names))
+        self.ui.tableWidget.setHorizontalHeaderLabels(column_names)
+        self.ui.tableWidget.setRowCount(len(data))
+        self.ui.tableWidget.setColumnCount(len(data[0]))
+        for i, row in enumerate(data):
+            for j, value in enumerate(row):
+                item = QTableWidgetItem(str(value))
+                self.ui.tableWidget.setItem(i, j, item)
+        cursor.close()
 
 
 if __name__ == "__main__":

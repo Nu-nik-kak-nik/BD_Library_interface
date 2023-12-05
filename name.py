@@ -58,3 +58,13 @@ LIST_BUTTON_TABLE_LIB = [
     'readers_btn',
     'is_btn'
 ]
+
+
+REPORT = [
+    "Select readers.idreader, readers.lastname, readers.firstname, readers.surname, " +
+    "(select count(idreader) from issuance WHERE readers.idreader = issuance.idreader) AS borrow_count, " +
+    "(select count(collateral) from issuance WHERE readers.idreader = issuance.idreader and issuance.collateral = 'Нет') AS not_returned " +
+    "from readers " +
+    "join issuance on readers.idreader=issuance.idreader " +
+    "group by readers.idreader"
+]
